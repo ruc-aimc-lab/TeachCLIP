@@ -1,0 +1,14 @@
+boto3==1.26.14
+botocore==1.29.14
+ftfy==6.2.0
+numpy==1.23.4
+opencv_python==4.6.0.66
+pandas==1.5.1
+Pillow==10.3.0
+regex==2022.10.31
+Requests==2.31.0
+scipy==1.13.0
+torch==1.12.0+cu113
+torchvision==0.13.0+cu113
+tqdm==4.64.1
+transformers==4.25.1
