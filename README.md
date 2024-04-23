@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ### data download
 
-Please refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip#:~:text=Data-,Preparing,-For MSRVTT).
+Please refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing).
 
 ### running scripts
 
