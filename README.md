@@ -18,11 +18,19 @@ pip install -r requirements.txt
 
 ## How to Run
 
-### data download
+### Data download
 
-Please refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing).
++ We provide data splits of five datasets at [Google drire](https://drive.google.com/drive/folders/1wfx0N0IyHkEwHWy5PYCij2i7kXynipSL?usp=sharing).
 
-### running scripts
++ For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip#:~:text=Data-,Preparing,-For MSRVTT).
+
+## Teacher checkpoint download
+
+We offer checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets. Please download the corresponding checkpoints before you start training the student model through knowledge distillation.
+
++ [Google drive](https://drive.google.com/drive/folders/1qaA8ObtQa8wbpfCyHcrh8MOk_W05VRR3?usp=sharing)
+
+### Running scripts
 
 + For MSRVTT:
 
@@ -60,10 +68,10 @@ If you find our method useful in your work, please cite:
 
 ```python
 @inproceedings{teachclip,
-    title = {Holistic Features are almost Sufficient for Text-to-Video Retrieval}
-    author = {Tian, Kaibin and Zhao, Ruixiang and Xin, Zijie and Lan, Bangxiang and Li, Xirong},
-    booktitle={CVPR},
-    year = {2024}
+  title = {Holistic Features are almost Sufficient for Text-to-Video Retrieval}
+  author = {Tian, Kaibin and Zhao, Ruixiang and Xin, Zijie and Lan, Bangxiang and Li, Xirong},
+  year = {2024},
+  booktitle={CVPR}
 }
 ```
 
