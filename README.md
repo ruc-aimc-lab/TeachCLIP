@@ -16,6 +16,7 @@ cd TeachCLIP
 pip install -r requirements.txt
 ```
 
+
 ## How to Run
 
 ### Data download
@@ -24,7 +25,7 @@ pip install -r requirements.txt
 
 + For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing).
 
-## Teacher checkpoint download
+### Teacher checkpoint download
 
 We offer checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets. Please download the corresponding checkpoints before you start training the student model through knowledge distillation.
 
@@ -32,7 +33,14 @@ We offer checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-C
 
 ### Training and evaluation
 
-
+| Dataset   | Training command                            | Evaluation command                         |
+| --------- | ------------------------------------------- | ------------------------------------------ |
+| MSRVTT-1k | `bash scripts/train_teachclip_msrvtt-1k.sh` | `bash scripts/eval_teachclip_msrvtt-1k.sh` |
+| MSRVTT-3k | `bash scripts/train_teachclip_msrvtt-3k.sh` | `bash scripts/eval_teachclip_msrvtt-3k.sh` |
+| MSVD      | `bash scripts/train_teachclip_msvd.sh`      | `bash scripts/eval_teachclip_msvd.sh`      |
+| VATEX     | `bash scripts/train_teachclip_vatex.sh`     | `bash scripts/eval_teachclip_vatex.sh`     |
+| ActNetCap | `bash scripts/train_teachclip_actnet.sh`    | `bash scripts/eval_teachclip_actnet.sh`    |
+| DiDeMo    | `bash scripts/train_teachclip_didemo.sh`    | `bash scripts/eval_teachclip_didemo.sh`    |
 
 ## Citation
 
