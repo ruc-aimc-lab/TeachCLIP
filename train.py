@@ -302,21 +302,6 @@ def save_model(epoch, args, model, optimizer, tr_loss, type_name=""):
     logger.info("Optimizer saved to %s", optimizer_state_file)
     return output_model_file
 
-def load_model(epoch, args, n_gpu, device, model_file=None):
-    if model_file is None or len(model_file) == 0:
-        model_file = os.path.join(args.output_dir, "pytorch_model.bin.{}".format(epoch))
-    if os.path.exists(model_file):
-        model_state_dict = torch.load(model_file, map_location='cpu')
-        if args.local_rank == 0:
-            logger.info("Model loaded from %s", model_file)
-        # Prepare model
-        cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed')
-        model = CLIP4Clip.from_pretrained(args.cross_model, cache_dir=cache_dir, state_dict=model_state_dict, task_config=args)
-
-        model.to(device)
-    else:
-        model = None
-    return model
 
 def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_gpu, optimizer, scheduler, global_step, local_rank=0):
     global logger
@@ -326,7 +311,6 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
     start_time = time.time()
     total_loss = 0.0
     
-
     gt_loss_fun = CrossEn()
     gt_rank_loss_fun = MaxMarginRankingLoss()
     gt_method = "contrastive"
@@ -762,11 +746,6 @@ def main():
                     best_score = R1
                     best_output_model_file = output_model_file
                 logger.info("The best model is: {}, the R1 is: {:.4f}".format(best_output_model_file, best_score))
-
-        ## Uncomment if want to test on the best checkpoint
-        # if args.local_rank == 0:
-        #     model = load_model(-1, args, n_gpu, device, model_file=best_output_model_file)
-        #     eval_epoch(args, model, test_dataloader, device, n_gpu)
 
     elif args.do_eval:
         if args.rank == 0:

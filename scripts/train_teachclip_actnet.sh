@@ -1,5 +1,5 @@
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torch.distributed.launch --nproc_per_node=8 \
-    main.py --teacher_num 1 \
+    train.py --teacher_num 1 \
     --init_teacher1_model ["checkpoint path of pretrained teacher model"] \
     --teacher1_name ["XCLIP", or "TS2Net", or "XPool"] \
     --do_train --num_thread_reader=8 \
