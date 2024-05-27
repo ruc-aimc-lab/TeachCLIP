@@ -43,16 +43,13 @@ class MSRVTT_DataLoader(Dataset):
 
         self.subset = subset
         assert self.subset in ["test","val"]
-        # video_id_path_dict = {}
-        # video_id_path_dict["test"] = os.path.join(self.data_path, "test_list.txt")
-        # sentence = self.data['sentence'].values[idx]
+
         video_ids  = list(set(self.data['video_id']))
         captions = {}
         for index, row in self.data.iterrows():
             if row['video_id'] not in captions.keys():
                 captions[row['video_id']] = []
                 captions[row['video_id']].append(row['sentence'])
-#         print(captions[row['video_id']])
             else:
                 captions[row['video_id']].append(row['sentence'])
         
@@ -62,7 +59,6 @@ class MSRVTT_DataLoader(Dataset):
         for video_id in video_ids:
             assert video_id in captions
             for cap in captions[video_id]:
-                # cap_txt = " ".join(cap)
                 cap_txt = cap
                 self.sentences_dict[len(self.sentences_dict)] = (video_id, cap_txt)
             self.cut_off_points.append(len(self.sentences_dict))

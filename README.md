@@ -30,37 +30,9 @@ We offer checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-C
 
 + [Google drive](https://drive.google.com/drive/folders/1qaA8ObtQa8wbpfCyHcrh8MOk_W05VRR3?usp=sharing)
 
-### Running scripts
+### Training and evaluation
 
-+ For MSRVTT:
 
-  ```shell
-  bash scripts/run_teachclip_msrvtt.sh
-  ```
-
-+ For MSVD:
-
-  ```shell
-  bash scripts/run_teachclip_msvd.sh
-  ```
-
-+ For VATEX:
-
-  ```shell
-  bash scripts/run_teachclip_vatex.sh
-  ```
-
-+ For DiDeMo:
-
-  ```shell
-  bash scripts/run_teachclip_didemo.sh
-  ```
-
-+ For ActivityNet:
-
-  ```shell
-  bash scripts/run_teachclip_actnet.sh
-  ```
 
 ## Citation
 
