@@ -42,6 +42,8 @@ We offer checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-C
 | ActNetCap | `bash scripts/train_teachclip_actnet.sh`    | `bash scripts/eval_teachclip_actnet.sh`    |
 | DiDeMo    | `bash scripts/train_teachclip_didemo.sh`    | `bash scripts/eval_teachclip_didemo.sh`    |
 
++ Fill in missing parameters (enclosed in `[ ]`) with your own path.
+
 ## Citation
 
 If you find our method useful in your work, please cite:
