@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ### Data download
 
-+ We provide data splits of five datasets at [Google drire](https://drive.google.com/drive/folders/1wfx0N0IyHkEwHWy5PYCij2i7kXynipSL?usp=sharing).
++ We provide data splits of five datasets at [Google drive](https://drive.google.com/drive/folders/1wfx0N0IyHkEwHWy5PYCij2i7kXynipSL?usp=sharing).
 
 + For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing).
 
