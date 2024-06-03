@@ -59,17 +59,27 @@ data
 
 ### Training
 
+Write the config file before training. [Here](https://github.com/ruc-aimc-lab/TeachCLIP/tree/main/configs), we provide a demo config file for each dataset. You can train TeachCLIP on specified GPUs and dataset by using the following command (taking `msrvtt-9k` as an example):
 
+```shell
+CUDA_VISIBLE_DEVICES=0,1 python -m torch.distributed.launch --nproc_per_node=2 train.py --config_path configs/msrvtt-9k.yaml
+```
 
 ### Inference
 
+You can specify which trained student model to use by setting `init_model` in config file. The similarity matrix between text and video will be saved under `output_dir`:
 
+```shell
+CUDA_VISIBLE_DEVICES=0 python -m torch.distributed.launch --nproc_per_node=1 inference.py --config_path configs/msrvtt-9k.yaml
+```
 
 ### Evaluation
 
+Use the following command to evaluate the similarity matrix, and the evaluation results will be saved under same `output_dir`:
 
-
-
+```shell
+python evaluation.py --config_path configs/msrvtt-9k.yaml
+```
 
 ## Citation
 
