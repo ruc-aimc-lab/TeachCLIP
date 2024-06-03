@@ -4,7 +4,7 @@ The official source code of our CVPR24 paper TeachCLIP, "[Holistic Features are 
 
 ![](./images/teachclip.png)
 
-## Requirement
+## Environment
 
 We used Anaconda to setup a deep learning workspace that supports PyTorch. Run the following script to install all the required packages.
 
@@ -17,32 +17,59 @@ pip install -r requirements.txt
 ```
 
 
-## How to Run
+## Data
 
 ### Data download
 
-+ We provide data splits of five datasets at [Google drive](https://drive.google.com/drive/folders/1wfx0N0IyHkEwHWy5PYCij2i7kXynipSL?usp=sharing).
++ We provide annotations of five datasets and checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets at [Google drive](https://drive.google.com/drive/folders/1cU0ehXfucf4M5IyDRSxywBadCt1LyZWz?usp=sharing). Data splits are provided in `annotations`.
 
-+ For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing).
++ For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing). Put the videos into the corresponding `video` folder for each dataset.
 
-### Teacher checkpoint download
+### Data organization
 
-We offer checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets. Please download the corresponding checkpoints before you start training the student model through knowledge distillation.
+Before starting to run the code, please organize the downloaded data in the following format:
 
-+ [Google drive](https://drive.google.com/drive/folders/1qaA8ObtQa8wbpfCyHcrh8MOk_W05VRR3?usp=sharing)
+```shell
+data
+├── datasets
+│   ├── msrvtt-9k
+│   │   ├── annotations
+│   │   │   ├── MSRVTT_data.json
+│   │   │   ├── MSRVTT_JSFUSION_test.csv
+│   │   │   └── MSRVTT_train.9k.csv
+│   │   └── videos
+│   │       ├── video0.mp4
+│   │       ├── video1.mp4
+│   │       └── ...
+│   ├── activitynet
+│   ├── didemo
+│   ├── msrvtt-7k
+│   ├── msvd
+│   └── vatex
+└── teacher_checkpoints
+    ├── xclip
+    │   ├── didemo_xclip_model.bin
+    │   ├── msrvtt-7k_xclip_model.bin
+    │   └── ...
+    ├── ts2net
+    └── xpool
+```
 
-### Training and evaluation
+## Code
 
-| Dataset   | Training command                            | Evaluation command                         |
-| --------- | ------------------------------------------- | ------------------------------------------ |
-| MSRVTT-1k | `bash scripts/train_teachclip_msrvtt-1k.sh` | `bash scripts/eval_teachclip_msrvtt-1k.sh` |
-| MSRVTT-3k | `bash scripts/train_teachclip_msrvtt-3k.sh` | `bash scripts/eval_teachclip_msrvtt-3k.sh` |
-| MSVD      | `bash scripts/train_teachclip_msvd.sh`      | `bash scripts/eval_teachclip_msvd.sh`      |
-| VATEX     | `bash scripts/train_teachclip_vatex.sh`     | `bash scripts/eval_teachclip_vatex.sh`     |
-| ActNetCap | `bash scripts/train_teachclip_actnet.sh`    | `bash scripts/eval_teachclip_actnet.sh`    |
-| DiDeMo    | `bash scripts/train_teachclip_didemo.sh`    | `bash scripts/eval_teachclip_didemo.sh`    |
+### Training
 
-+ Fill in missing parameters (enclosed in `[ ]`) with your own path.
+
+
+### Inference
+
+
+
+### Evaluation
+
+
+
+
 
 ## Citation
 
