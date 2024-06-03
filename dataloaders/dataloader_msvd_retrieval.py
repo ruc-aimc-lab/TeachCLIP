@@ -15,7 +15,7 @@ class MSVD_DataLoader(Dataset):
             self,
             subset,
             data_path,
-            features_path,
+            video_path,
             tokenizer,
             max_words=30,
             feature_framerate=1.0,
@@ -25,7 +25,7 @@ class MSVD_DataLoader(Dataset):
             slice_framepos=0,
     ):
         self.data_path = data_path
-        self.features_path = features_path
+        self.video_path = video_path
         self.feature_framerate = feature_framerate
         self.max_words = max_words
         self.max_frames = max_frames
@@ -52,11 +52,11 @@ class MSVD_DataLoader(Dataset):
             captions = pickle.load(f)
         
         video_dict = {}
-        tmpfeatures_path = self.features_path.replace("frames","videos")
-        # print(tmpfeatures_path)
-        for root, dub_dir, video_files in os.walk(tmpfeatures_path):
-            for video_file in dub_dir:
-                video_id_ = video_file
+        tmpvideo_path = self.video_path.replace("frames", "videos")
+        # print(tmpvideo_path)
+        for root, dub_dir, video_files in os.walk(tmpvideo_path):
+            for video_file in video_files:
+                video_id_ = video_file.split(".")[0]
                 if video_id_ not in video_ids:
                     continue
                 file_path_ = os.path.join(root, video_file)
@@ -87,7 +87,7 @@ class MSVD_DataLoader(Dataset):
             print("For {}, video number: {}".format(self.subset, self.video_num))
 
         print("Video number: {}".format(len(self.video_dict)))
-        print("Total Paire: {}".format(len(self.sentences_dict)))
+        print("Total Pair: {}".format(len(self.sentences_dict)))
 
         self.sample_len = len(self.sentences_dict)
         self.rawVideoExtractor = RawVideoExtractor(framerate=feature_framerate, size=image_resolution)

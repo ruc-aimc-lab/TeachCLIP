@@ -10,6 +10,7 @@ import os
 from metrics import compute_metrics, tensor_text_to_video_metrics, tensor_video_to_text_sim
 import time
 import argparse
+import yaml
 from modules.tokenization_clip import SimpleTokenizer as ClipTokenizer
 from modules.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 from modules.modeling import CLIP4Clip
@@ -30,9 +31,8 @@ global logger
 
 def get_args(description='CLIP4Clip Distill on Retrieval Task'):
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--beta', type=float, default=1.0, help='beta')
-    parser.add_argument('--distill_method', type=str, default='pear', help='')
-    parser.add_argument('--fine_method', type=str, default='ce', help='')
+
+    parser.add_argument('--config_path', type=str, required=True, help='Path to the config.')
 
     parser.add_argument('--teacher_num', type=int, default=1, help='')
     parser.add_argument('--init_teacher1_model', type=str, default='', help='')
@@ -42,91 +42,24 @@ def get_args(description='CLIP4Clip Distill on Retrieval Task'):
     parser.add_argument('--teacher2_name', type=str, default='', help='')
     parser.add_argument('--teacher3_name', type=str, default='', help='')
     
-
-    parser.add_argument("--do_pretrain", action='store_true', help="Whether to run training.")
-    parser.add_argument("--do_train", action='store_true', help="Whether to run training.")
-    parser.add_argument("--do_eval", action='store_true', help="Whether to run eval on the dev set.")
-
-    parser.add_argument('--train_csv', type=str, default='data/.train.csv', help='')
-    parser.add_argument('--val_csv', type=str, default='data/.val.csv', help='')
-    parser.add_argument('--test_csv', type=str, default='data/.test.csv', help='')
-    
-    parser.add_argument('--data_path', type=str, default='data/caption.pickle', help='data pickle file path')
-    parser.add_argument('--features_path', type=str, default='data/videos_feature.pickle', help='feature path')
-
-    parser.add_argument('--num_thread_reader', type=int, default=1, help='')
-    parser.add_argument('--lr', type=float, default=0.0001, help='initial learning rate')
-    parser.add_argument('--epochs', type=int, default=20, help='upper epoch limit')
-    parser.add_argument('--batch_size', type=int, default=256, help='batch size')
-    parser.add_argument('--batch_size_val', type=int, default=3500, help='batch size eval')
-    parser.add_argument('--lr_decay', type=float, default=0.9, help='Learning rate exp epoch decay')
-    parser.add_argument('--n_display', type=int, default=100, help='Information display frequence')
-    parser.add_argument('--video_dim', type=int, default=1024, help='video feature dimension')
-    parser.add_argument('--seed', type=int, default=42, help='random seed')
-    parser.add_argument('--max_words', type=int, default=20, help='')
-    parser.add_argument('--max_frames', type=int, default=100, help='')
-    parser.add_argument('--feature_framerate', type=int, default=1, help='')
-    parser.add_argument('--margin', type=float, default=0.1, help='margin for loss')
-    parser.add_argument('--hard_negative_rate', type=float, default=0.5, help='rate of intra negative sample')
-    parser.add_argument('--negative_weighting', type=int, default=1, help='Weight the loss for intra negative')
-    parser.add_argument('--n_pair', type=int, default=1, help='Num of pair to output from data loader')
-
-    parser.add_argument("--output_dir", default=None, type=str, required=True,
-                        help="The output directory where the model predictions and checkpoints will be written.")
-    parser.add_argument("--cross_model", default="cross-base", type=str, required=False, help="Cross module")
     parser.add_argument("--init_model", default=None, type=str, required=False, help="Initial model.")
     parser.add_argument("--resume_model", default=None, type=str, required=False, help="Resume train model.")
-    parser.add_argument("--do_lower_case", action='store_true', help="Set this flag if you are using an uncased model.")
-    parser.add_argument("--warmup_proportion", default=0.1, type=float,
-                        help="Proportion of training to perform linear learning rate warmup for. E.g., 0.1 = 10%% of training.")
-    parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
-                        help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument('--n_gpu', type=int, default=1, help="Changed in the execute process.")
 
     parser.add_argument("--cache_dir", default="", type=str,
                         help="Where do you want to store the pre-trained models downloaded from s3")
 
-    parser.add_argument('--fp16', action='store_true',
-                        help="Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit")
-    parser.add_argument('--fp16_opt_level', type=str, default='O1',
-                        help="For fp16: Apex AMP optimization level selected in ['O0', 'O1', 'O2', and 'O3']."
-                             "See details at https://nvidia.github.io/apex/amp.html")
-
-    parser.add_argument("--task_type", default="retrieval", type=str, help="Point the task `retrieval` to finetune.")
-    parser.add_argument("--datatype", default="msrvtt", type=str, help="Point the dataset to finetune.")
-
     parser.add_argument("--world_size", default=0, type=int, help="distribted training")
     parser.add_argument("--local_rank", default=0, type=int, help="distribted training")
     parser.add_argument("--rank", default=0, type=int, help="distribted training")
-    parser.add_argument('--coef_lr', type=float, default=1., help='coefficient for bert branch.')
-    parser.add_argument('--use_mil', action='store_true', help="Whether use MIL as Miech et. al. (2020).")
-    parser.add_argument('--sampled_use_mil', action='store_true', help="Whether MIL, has a high priority than use_mil.")
-
-    parser.add_argument('--text_num_hidden_layers', type=int, default=12, help="Layer NO. of text.")
-    parser.add_argument('--visual_num_hidden_layers', type=int, default=12, help="Layer NO. of visual.")
-    parser.add_argument('--cross_num_hidden_layers', type=int, default=4, help="Layer NO. of cross.")
-
-    parser.add_argument('--loose_type', action='store_true', help="Default using tight type for retrieval.")
-    parser.add_argument('--expand_msrvtt_sentences', action='store_true', help="")
-
-    parser.add_argument('--train_frame_order', type=int, default=0, choices=[0, 1, 2],
-                        help="Frame order, 0: ordinary order; 1: reverse order; 2: random order.")
-    parser.add_argument('--eval_frame_order', type=int, default=0, choices=[0, 1, 2],
-                        help="Frame order, 0: ordinary order; 1: reverse order; 2: random order.")
-
-    parser.add_argument('--freeze_layer_num', type=int, default=0, help="Layer NO. of CLIP need to freeze.")
-    parser.add_argument('--slice_framepos', type=int, default=0, choices=[0, 1, 2],
-                        help="0: cut from head frames; 1: cut from tail frames; 2: extract frames uniformly.")
-    parser.add_argument('--linear_patch', type=str, default="2d", choices=["2d", "3d"],
-                        help="linear projection of flattened patches.")
-    parser.add_argument('--sim_header', type=str, default="meanP",
-                        choices=["meanP", "seqLSTM", "seqTransf", "tightTransf"],
-                        help="choice a similarity header.")
-
-    parser.add_argument("--pretrained_clip_name", default="ViT-B/32", type=str, help="Choose a CLIP version")
-    parser.add_argument("--concept_word_vocab_path", default=None, type=str, help="word_vocab_path")
 
     args = parser.parse_args()
+    with open(args.config_path, 'r') as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+        for key, value in data.items():
+            for k, v in value.items():
+                setattr(args, k, v)
+
 
     if args.sim_header == "tightTransf":
         args.loose_type = False
@@ -135,8 +68,6 @@ def get_args(description='CLIP4Clip Distill on Retrieval Task'):
     if args.gradient_accumulation_steps < 1:
         raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
             args.gradient_accumulation_steps))
-    if not args.do_train and not args.do_eval:
-        raise ValueError("At least one of `do_train` or `do_eval` must be True.")
 
     args.batch_size = int(args.batch_size / args.gradient_accumulation_steps)
 
@@ -188,15 +119,9 @@ def init_device(args, local_rank):
     return device, n_gpu
 
 def init_model(args, device, n_gpu, local_rank):
-
-    if args.init_model:
-        model_state_dict = torch.load(args.init_model, map_location='cpu')
-    else:
-        model_state_dict = None
-
     # Prepare model
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed')
-    model = CLIP4Clip.from_pretrained(args.cross_model, cache_dir=cache_dir, state_dict=model_state_dict, task_config=args)
+    model = CLIP4Clip.from_pretrained(args.cross_model, cache_dir=cache_dir, task_config=args)
 
     model.to(device)
     # print(model.clip)
@@ -312,8 +237,6 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
     total_loss = 0.0
     
     gt_loss_fun = CrossEn()
-    gt_rank_loss_fun = MaxMarginRankingLoss()
-    gt_method = "contrastive"
     distill_method = args.distill_method #"pear" #"ce",l1
     fine_method = args.fine_method #"ce" #"pear",l1
     distill_loss_fun = torch.nn.SmoothL1Loss(reduction='mean')
@@ -329,16 +252,12 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
         # lambda_param = 1.0
         
         input_ids, input_mask, segment_ids, video, video_mask = batch
-        sim_matrix,Frameweight = model(input_ids, segment_ids, input_mask, video, video_mask,return_fine=True)
+        sim_matrix, Frameweight = model(input_ids, segment_ids, input_mask, video, video_mask,return_fine=True)
 
-
-        if gt_method=="rank":
-            gt_loss = gt_rank_loss_fun(sim_matrix)
-        elif gt_method=="contrastive":
-            sim_matrix = sim_matrix/beta_param
-            sim_loss1 = gt_loss_fun(sim_matrix)
-            sim_loss2 = gt_loss_fun(sim_matrix.T)
-            gt_loss = (sim_loss1 + sim_loss2) / 2
+        sim_matrix = sim_matrix/beta_param
+        sim_loss1 = gt_loss_fun(sim_matrix)
+        sim_loss2 = gt_loss_fun(sim_matrix.T)
+        gt_loss = (sim_loss1 + sim_loss2) / 2
 
         teacher_sim_matrixs = []
         sentence2frames_sims = []
@@ -641,7 +560,6 @@ def main():
 
     tokenizer = ClipTokenizer()
 
-    assert  args.task_type == "retrieval"
     model = init_model(args, device, n_gpu, args.local_rank)
 
     teacher_models = init_teacher_models(args, device, n_gpu, args.local_rank)
@@ -671,17 +589,17 @@ def main():
     ## ####################################
     # dataloader loading
     ## ####################################
-    assert args.datatype in DATALOADER_DICT
+    assert args.data_type in DATALOADER_DICT
 
-    assert DATALOADER_DICT[args.datatype]["test"] is not None \
-           or DATALOADER_DICT[args.datatype]["val"] is not None
+    assert DATALOADER_DICT[args.data_type]["test"] is not None \
+           or DATALOADER_DICT[args.data_type]["val"] is not None
 
     test_dataloader, test_length = None, 0
-    if DATALOADER_DICT[args.datatype]["test"] is not None:
-        test_dataloader, test_length = DATALOADER_DICT[args.datatype]["test"](args, tokenizer)
+    if DATALOADER_DICT[args.data_type]["test"] is not None:
+        test_dataloader, test_length = DATALOADER_DICT[args.data_type]["test"](args, tokenizer)
 
-    if DATALOADER_DICT[args.datatype]["val"] is not None:
-        val_dataloader, val_length = DATALOADER_DICT[args.datatype]["val"](args, tokenizer, subset="val")
+    if DATALOADER_DICT[args.data_type]["val"] is not None:
+        val_dataloader, val_length = DATALOADER_DICT[args.data_type]["val"](args, tokenizer, subset="val")
     else:
         val_dataloader, val_length = test_dataloader, test_length
 
@@ -698,58 +616,52 @@ def main():
         logger.info("  Num examples = %d", val_length)
 
     ## ####################################
-    # train and eval
+    # train
     ## ####################################
-    # eval_epoch(args, model, test_dataloader, device, n_gpu)
-    if args.do_train:
-        train_dataloader, train_length, train_sampler = DATALOADER_DICT[args.datatype]["train"](args, tokenizer)
-        num_train_optimization_steps = (int(len(train_dataloader) + args.gradient_accumulation_steps - 1)
-                                        / args.gradient_accumulation_steps) * args.epochs
+    train_dataloader, train_length, train_sampler = DATALOADER_DICT[args.data_type]["train"](args, tokenizer)
+    num_train_optimization_steps = (int(len(train_dataloader) + args.gradient_accumulation_steps - 1)
+                                    / args.gradient_accumulation_steps) * args.epochs
 
-        coef_lr = args.coef_lr
-        optimizer, scheduler, model = prep_optimizer(args, model, num_train_optimization_steps, device, n_gpu, args.local_rank, coef_lr=coef_lr)
+    coef_lr = args.coef_lr
+    optimizer, scheduler, model = prep_optimizer(args, model, num_train_optimization_steps, device, n_gpu, args.local_rank, coef_lr=coef_lr)
 
-        if args.local_rank == 0:
-            logger.info("***** Running training *****")
-            logger.info("  Num examples = %d", train_length)
-            logger.info("  Batch size = %d", args.batch_size)
-            logger.info("  Num steps = %d", num_train_optimization_steps * args.gradient_accumulation_steps)
+    if args.local_rank == 0:
+        logger.info("***** Running training *****")
+        logger.info("  Num examples = %d", train_length)
+        logger.info("  Batch size = %d", args.batch_size)
+        logger.info("  Num steps = %d", num_train_optimization_steps * args.gradient_accumulation_steps)
 
-        best_score = 0.00001
-        best_output_model_file = "None"
-        ## ##############################################################
-        # resume optimizer state besides loss to continue train
-        ## ##############################################################
-        resumed_epoch = 0
-        if args.resume_model:
-            checkpoint = torch.load(args.resume_model, map_location='cpu')
-            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            resumed_epoch = checkpoint['epoch']+1
-            resumed_loss = checkpoint['loss']
-        
-        global_step = 0
-        for epoch in range(resumed_epoch, args.epochs):
-            train_sampler.set_epoch(epoch)
-            tr_loss, global_step = train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_gpu, optimizer,
-                                               scheduler, global_step, local_rank=args.local_rank)
-            if args.rank == 0:
-                logger.info("Epoch %d/%s Finished, Train Loss: %f", epoch + 1, args.epochs, tr_loss)
-
-                output_model_file = save_model(epoch, args, model, optimizer, tr_loss, type_name="")
-
-                ## Run on val dataset, this process is *TIME-consuming*.
-                # logger.info("Eval on val dataset")
-                # R1 = eval_epoch(args, model, val_dataloader, device, n_gpu)
-
-                R1 = eval_epoch(args, model, test_dataloader, device, n_gpu)
-                if best_score <= R1:
-                    best_score = R1
-                    best_output_model_file = output_model_file
-                logger.info("The best model is: {}, the R1 is: {:.4f}".format(best_output_model_file, best_score))
-
-    elif args.do_eval:
+    best_score = 0.00001
+    best_output_model_file = "None"
+    ## ##############################################################
+    # resume optimizer state besides loss to continue train
+    ## ##############################################################
+    resumed_epoch = 0
+    if args.resume_model:
+        checkpoint = torch.load(args.resume_model, map_location='cpu')
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        resumed_epoch = checkpoint['epoch']+1
+        resumed_loss = checkpoint['loss']
+    
+    global_step = 0
+    for epoch in range(resumed_epoch, args.epochs):
+        train_sampler.set_epoch(epoch)
+        tr_loss, global_step = train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_gpu, optimizer,
+                                            scheduler, global_step, local_rank=args.local_rank)
         if args.rank == 0:
-            eval_epoch(args, model, test_dataloader, device, n_gpu)
+            logger.info("Epoch %d/%s Finished, Train Loss: %f", epoch + 1, args.epochs, tr_loss)
+
+            output_model_file = save_model(epoch, args, model, optimizer, tr_loss, type_name="")
+
+            ## Run on val dataset, this process is *TIME-consuming*.
+            # logger.info("Eval on val dataset")
+            # R1 = eval_epoch(args, model, val_dataloader, device, n_gpu)
+
+            R1 = eval_epoch(args, model, test_dataloader, device, n_gpu)
+            if best_score <= R1:
+                best_score = R1
+                best_output_model_file = output_model_file
+            logger.info("The best model is: {}, the R1 is: {:.4f}".format(best_output_model_file, best_score))
 
 if __name__ == "__main__":
     main()

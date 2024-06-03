@@ -18,7 +18,7 @@ class MSRVTT_DataLoader(Dataset):
             self,
             subset,
             csv_path,
-            features_path,
+            video_path,
             tokenizer,
             max_words=30,
             feature_framerate=1.0,
@@ -29,7 +29,7 @@ class MSRVTT_DataLoader(Dataset):
     ):
 
         self.data = pd.read_csv(csv_path)
-        self.features_path = features_path
+        self.video_path = video_path
         self.feature_framerate = feature_framerate
         self.max_words = max_words
         self.max_frames = max_frames
@@ -136,7 +136,7 @@ class MSRVTT_DataLoader(Dataset):
 
         for i, video_id in enumerate(choice_video_ids):
             # Individual for YoucokII dataset, due to it video format
-            video_path = os.path.join(self.features_path, "{}.mp4".format(video_id))
+            video_path = os.path.join(self.video_path, "{}.mp4".format(video_id))
             if os.path.exists(video_path) is False:
                 video_path = video_path.replace(".mp4", ".avi")
                 if os.path.exists(video_path) is False:
@@ -193,7 +193,7 @@ class MSRVTT_TrainDataLoader(Dataset):
             self,
             csv_path,
             json_path,
-            features_path,
+            video_path,
             tokenizer,
             max_words=30,
             feature_framerate=1.0,
@@ -207,7 +207,7 @@ class MSRVTT_TrainDataLoader(Dataset):
         self.return_sentence_id = return_sentence_id
         self.csv = pd.read_csv(csv_path)
         self.data = json.load(open(json_path, 'r'))
-        self.features_path = features_path
+        self.video_path = video_path
         self.feature_framerate = feature_framerate
         self.max_words = max_words
         self.max_frames = max_frames
@@ -306,7 +306,7 @@ class MSRVTT_TrainDataLoader(Dataset):
 
         for i, video_id in enumerate(choice_video_ids):
             # Individual for YoucokII dataset, due to it video format  
-            video_path = os.path.join(self.features_path, "{}.mp4".format(video_id))            
+            video_path = os.path.join(self.video_path, "{}.mp4".format(video_id))            
             if os.path.exists(video_path) is False:
                 video_path = video_path.replace(".mp4", ".avi")
                 if os.path.exists(video_path) is False:
@@ -370,7 +370,7 @@ class MSRVTT_TrainDataLoader_Sentence(Dataset):
             self,
             csv_path,
             json_path,
-            features_path,
+            video_path,
             tokenizer,
             max_words=30,
             feature_framerate=1.0,
@@ -384,7 +384,7 @@ class MSRVTT_TrainDataLoader_Sentence(Dataset):
         self.return_sentence_id = return_sentence_id
         self.csv = pd.read_csv(csv_path)
         self.data = json.load(open(json_path, 'r'))
-        self.features_path = features_path
+        self.video_path = video_path
         self.feature_framerate = feature_framerate
         self.max_words = max_words
         self.max_frames = max_frames
@@ -485,7 +485,7 @@ class MSRVTT_TrainDataLoader_Sentence(Dataset):
 
         for i, video_id in enumerate(choice_video_ids):
             # Individual for YoucokII dataset, due to it video format  
-            video_path = os.path.join(self.features_path, "{}.mp4".format(video_id))            
+            video_path = os.path.join(self.video_path, "{}.mp4".format(video_id))            
             if os.path.exists(video_path) is False:
                 video_path = video_path.replace(".mp4", ".avi")
                 if os.path.exists(video_path) is False:

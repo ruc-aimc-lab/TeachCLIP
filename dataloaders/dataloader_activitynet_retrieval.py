@@ -16,7 +16,7 @@ class ActivityNet_DataLoader(Dataset):
             self,
             subset,
             data_path,
-            features_path,
+            video_path,
             tokenizer,
             max_words=30,
             feature_framerate=1.0,
@@ -26,7 +26,7 @@ class ActivityNet_DataLoader(Dataset):
             slice_framepos=0,
     ):
         self.data_path = data_path
-        self.features_path = features_path
+        self.video_path = video_path
         self.feature_framerate = feature_framerate
         self.max_words = max_words
         self.max_frames = max_frames
@@ -56,7 +56,7 @@ class ActivityNet_DataLoader(Dataset):
         print("pseudo caption dict: {}".format(len(pseudo_caption_dict.keys())))
 
         video_dict = {}
-        for root, dub_dir, video_files in os.walk(self.features_path):
+        for root, dub_dir, video_files in os.walk(self.video_path):
             for video_file in video_files:
                 video_id_ = ".".join(video_file.split(".")[:-1])[2:]
                 if video_id_ not in video_id_list:

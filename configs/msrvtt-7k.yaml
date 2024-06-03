@@ -1,0 +1,51 @@
+model:
+  pretrained_clip_name: "ViT-B/32"
+  freeze_layer_num: 0
+  linear_patch: "2d" # linear projection of flattened patches. ["2d", "3d"]
+  sim_header: "seqTransf" # choice a similarity header. ["meanP", "seqLSTM", "seqTransf", "tightTransf"]
+  cross_model: "cross-base"
+  loose_type: True
+  cross_num_hidden_layers: 4
+
+datasets:
+  data_type: "msrvtt"
+  train_csv: "data/datasets/msrvtt-7k/annotations/MSRVTT_train.7k.csv"
+  val_csv: "data/datasets/msrvtt-7k/annotations/MSRVTT_full_split_val.csv"
+  test_csv: "data/datasets/msrvtt-7k/annotations/MSRVTT_full_split_test.csv"
+  data_path: "data/datasets/msrvtt-7k/annotations/MSRVTT_data.json"
+  video_path: "data/datasets/msrvtt-7k/videos"
+
+  num_thread_reader: 8
+  max_words: 32
+  max_frames: 12
+  feature_framerate: 1
+  expand_msrvtt_sentences: True
+  train_frame_order: 0 # Frame order, 0: ordinary order; 1: reverse order; 2: random order.
+  eval_frame_order: 0
+  slice_framepos: 2 # "0: cut from head frames; 1: cut from tail frames; 2: extract frames uniformly."
+
+
+distillation:
+  beta: 1.0
+  distill_method: "pear"
+  fine_method: "ce"
+  teacher_num: 1
+  teacher1_name: "XCLIP"
+  init_teacher1_model: "data/teacher_checkpoints/xclip/msrvtt-7k_xclip_model.bin"
+
+train:
+  overwrite: False
+  seed: 42
+  lr: 0.0001
+  coef_lr: 0.001
+  epochs: 10
+  batch_size: 120
+  batch_size_val: 40
+  lr_decay: 0.9
+  n_display: 10
+  warmup_proportion: 0.1
+  gradient_accumulation_steps: 1
+  output_dir: "ckpts/msrvtt-7k_xclip-as-teacher_vit32"
+
+eval:
+  init_model: "ckpts/msrvtt-7k_xclip-as-teacher_vit32/pytorch_model.bin.0" # best model checkpoint for evaluation
