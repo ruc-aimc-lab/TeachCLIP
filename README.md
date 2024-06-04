@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ### Data download
 
-+ We provide annotations of five datasets and checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets at [Google drive](https://drive.google.com/drive/folders/1cU0ehXfucf4M5IyDRSxywBadCt1LyZWz?usp=sharing). Video caption and data splits are provided in `Annotations` and `VideoSet`.
++ We provide annotations of five datasets and checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets at [Google drive](https://drive.google.com/drive/folders/1cU0ehXfucf4M5IyDRSxywBadCt1LyZWz?usp=sharing). Video captions and data splits are provided in `Annotations` and `VideoSet`.
 
 + For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing). Put the videos into the corresponding `VideoSet` folder for each dataset. (It is recommended to use symbolic links.)
 
@@ -36,7 +36,7 @@ data
 │   │   ├── Annotations
 │   │   │   ├── MSRVTT_data.json
 │   │   │   ├── MSRVTT_JSFUSION_test.csv
-│   │   │   └── MSRVTT_train.9k.csv
+│   │   │   └── ...
 │   │   ├── Saves
 │   │   │   └── msrvtt-7k_xclip-as-teacher_vit32
 │   │   │       ├── run0
