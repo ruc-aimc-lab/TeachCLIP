@@ -15,7 +15,7 @@ from modules.until_module import PreTrainedModel, AllGather, CrossEn, BTloss, Cl
 from modules.module_cross import CrossModel, CrossConfig, Transformer as TransformerClip
 from modules.differential_topk import VisualTokenSelection, TextTokenSelection, VisualTokenRandomSelection, STVisualTokenSelection
 
-from modules.module_clip import CLIP, convert_weights
+from modules.module_clip_ts2net import CLIP, convert_weights
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from modules.modeling import CLIP4ClipPreTrainedModel, show_log, update_attr, check_attr
 
