@@ -201,7 +201,7 @@ def dataloader_activity_train(args, tokenizer):
 
     return dataloader, len(activity_dataset), train_sampler
 
-def dataloader_activity_test(args, tokenizer, subset="test"):
+def dataloader_activity_test(args, tokenizer, subset="val"):
     activity_testset = ActivityNet_DataLoader(
         subset=subset,
         data_path=args.data_path,
@@ -213,14 +213,14 @@ def dataloader_activity_test(args, tokenizer, subset="test"):
         frame_order=args.eval_frame_order,
         slice_framepos=args.slice_framepos,
     )
-    dataloader_msrvtt = DataLoader(
+    dataloader = DataLoader(
         activity_testset,
         batch_size=args.batch_size_val,
         num_workers=args.num_thread_reader,
         shuffle=False,
         drop_last=False,
     )
-    return dataloader_msrvtt, len(activity_testset)
+    return dataloader, len(activity_testset)
 
 
 def dataloader_didemo_train(args, tokenizer):

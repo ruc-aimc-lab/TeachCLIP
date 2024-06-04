@@ -93,6 +93,14 @@ def set_seed_logger(args):
 
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir, exist_ok=True)
+    if args.overwrite:
+        args.output_dir = os.path.join(args.output_dir, 'run0')
+    else:
+        run_id = len(os.listdir(args.output_dir))
+        args.output_dir = os.path.join(args.output_dir, 'run{}'.format(run_id))
+    if args.local_rank == 0:
+        os.makedirs(args.output_dir, exist_ok=True)
+    time.sleep(3)
 
     logger = get_logger(os.path.join(args.output_dir, "log.txt"))
 

@@ -9,8 +9,8 @@ model:
 
 datasets:
   data_type: "didemo"
-  data_path: "data/datasets/didemo/annotations"
-  video_path: "data/datasets/didemo/videos"
+  data_path: "data/datasets/didemo/Annotations"
+  video_path: "data/datasets/didemo/VideoData"
 
   num_thread_reader: 8
   max_words: 64
@@ -41,7 +41,7 @@ train:
   n_display: 10
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
-  output_dir: "ckpts/didemo_xclip-as-teacher_vit32"
+  output_dir: "data/datasets/didemo/Saves/xclip-as-teacher_vit32"
 
 eval:
-  init_model: "ckpts/didemo_xclip-as-teacher_vit32/pytorch_model.bin.0" # best model checkpoint for evaluation
+  init_model: "" # best model checkpoint for evaluation

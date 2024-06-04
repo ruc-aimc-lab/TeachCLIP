@@ -9,11 +9,11 @@ model:
 
 datasets:
   data_type: "msrvtt"
-  train_csv: "data/datasets/msrvtt-9k/annotations/MSRVTT_train.9k.csv"
-  val_csv: "data/datasets/msrvtt-9k/annotations/MSRVTT_JSFUSION_test.csv"
-  test_csv: "data/datasets/msrvtt-9k/annotations/MSRVTT_JSFUSION_test.csv"
-  data_path: "data/datasets/msrvtt-9k/annotations/MSRVTT_data.json"
-  video_path: "data/datasets/msrvtt-9k/videos"
+  train_csv: "data/datasets/msrvtt/Annotations/MSRVTT_train.9k.csv"
+  val_csv: "data/datasets/msrvtt/Annotations/MSRVTT_JSFUSION_test.csv"
+  test_csv: "data/datasets/msrvtt/Annotations/MSRVTT_JSFUSION_test.csv"
+  data_path: "data/datasets/msrvtt/Annotations/MSRVTT_data.json"
+  video_path: "data/datasets/msrvtt/VideoData"
 
   num_thread_reader: 8
   max_words: 32
@@ -45,7 +45,7 @@ train:
   n_display: 10
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
-  output_dir: "ckpts/msrvtt-9k_xclip-as-teacher_vit32"
+  output_dir: "data/datasets/msrvtt/Saves/msrvtt-9k_xclip-as-teacher_vit32"
 
 eval:
-  init_model: "ckpts/msrvtt-9k_xclip-as-teacher_vit32/pytorch_model.bin.6" # best model checkpoint for evaluation
+  init_model: "" # best model checkpoint for evaluation

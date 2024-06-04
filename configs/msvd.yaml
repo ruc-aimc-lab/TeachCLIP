@@ -9,8 +9,8 @@ model:
 
 datasets:
   data_type: "msvd"
-  data_path: "data/datasets/msvd/annotations"
-  video_path: "data/datasets/msvd/videos"
+  data_path: "data/datasets/msvd/Annotations"
+  video_path: "data/datasets/msvd/VideoData"
 
   num_thread_reader: 8
   max_words: 32
@@ -41,7 +41,7 @@ train:
   n_display: 10
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
-  output_dir: "ckpts/msvd_xclip-as-teacher_vit32"
+  output_dir: "data/datasets/msvd/Saves/xclip-as-teacher_vit32"
 
 eval:
-  init_model: "ckpts/msvd_xclip-as-teacher_vit32/pytorch_model.bin.0" # best model checkpoint for evaluation
+  init_model: "" # best model checkpoint for evaluation

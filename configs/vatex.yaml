@@ -9,11 +9,11 @@ model:
 
 datasets:
   data_type: "msrvtt"
-  train_csv: "data/datasets/vatex/annotations/VATEX_train.csv"
-  val_csv: "data/datasets/vatex/annotations/VATEX_val.csv"
-  test_csv: "data/datasets/vatex/annotations/VATEX_test.csv"
-  data_path: "data/datasets/vatex/annotations/VATEX_data.json"
-  video_path: "data/datasets/vatex/videos"
+  train_csv: "data/datasets/vatex/Annotations/VATEX_train.csv"
+  val_csv: "data/datasets/vatex/Annotations/VATEX_val.csv"
+  test_csv: "data/datasets/vatex/Annotations/VATEX_test.csv"
+  data_path: "data/datasets/vatex/Annotations/VATEX_data.json"
+  video_path: "data/datasets/vatex/VideoData"
 
   num_thread_reader: 8
   max_words: 32
@@ -45,7 +45,7 @@ train:
   n_display: 10
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
-  output_dir: "ckpts/vatex_xclip-as-teacher_vit32"
+  output_dir: "data/datasets/didemo/Saves/xclip-as-teacher_vit32"
 
 eval:
-  init_model: "ckpts/vatex_xclip-as-teacher_vit32/pytorch_model.bin.1" # best model checkpoint for evaluation
+  init_model: "" # best model checkpoint for evaluation
