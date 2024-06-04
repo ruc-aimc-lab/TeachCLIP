@@ -77,7 +77,7 @@ def set_seed_logger(args):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir, exist_ok=True)
 
-    logger = get_logger(os.path.join(args.output_dir, "log.txt"))
+    logger = get_logger(os.path.join(args.output_dir, "infer_log.txt"))
 
     if args.local_rank == 0:
         logger.info("Effective parameters:")
