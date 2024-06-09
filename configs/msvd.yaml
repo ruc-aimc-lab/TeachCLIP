@@ -25,12 +25,14 @@ distillation:
   beta: 1.0
   distill_method: "pear"
   fine_method: "ce"
-  teacher_num: 1
+  teacher_num: 2
   teacher1_name: "XCLIP"
   init_teacher1_model: "data/teacher_checkpoints/xclip/msvd_xclip_model.bin"
+  teacher2_name: "TS2Net"
+  init_teacher2_model: "data/teacher_checkpoints/ts2net/msvd_ts2net_model.bin"
 
 train:
-  overwrite: False
+  overwrite: True
   seed: 42
   lr: 0.0001
   coef_lr: 0.001
@@ -41,7 +43,7 @@ train:
   n_display: 10
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
-  output_dir: "data/datasets/msvd/Saves/xclip-as-teacher_vit32"
+  output_dir: "data/datasets/msvd/Saves/xclip+ts2net-as-teacher_vit32"
 
 eval:
   init_model: "" # best model checkpoint for evaluation
