@@ -33,7 +33,7 @@ distillation:
   teacher1_name: "XCLIP"
   init_teacher1_model: "data/teacher_checkpoints/xclip/msrvtt-9k_xclip_model.bin"
   teacher2_name: "TS2Net"
-  init_teacher1_model: "data/teacher_checkpoints/ts2net/msrvtt-9k_ts2net_model.bin"
+  init_teacher2_model: "data/teacher_checkpoints/ts2net/msrvtt-9k_ts2net_model.bin"
 
 train:
   overwrite: False
@@ -42,7 +42,7 @@ train:
   coef_lr: 0.001
   epochs: 10
   batch_size: 120
-  batch_size_val: 20
+  batch_size_val: 40
   lr_decay: 0.9
   n_display: 10
   warmup_proportion: 0.1
