@@ -489,45 +489,8 @@ def eval_epoch(args, model, test_dataloader, device, n_gpu):
         # ----------------------------------
         # 2. calculate the similarity
         # ----------------------------------
-        if n_gpu > 1:
-            device_ids = list(range(n_gpu))
-            batch_list_t_splits = []
-            batch_list_v_splits = []
-            batch_t_output_splits = []
-            batch_v_output_splits = []
-            bacth_len = len(batch_list_t)
-            split_len = (bacth_len + n_gpu - 1) // n_gpu
-            for dev_id in device_ids:
-                s_, e_ = dev_id * split_len, (dev_id + 1) * split_len
-                if dev_id == 0:
-                    batch_list_t_splits.append(batch_list_t[s_:e_])
-                    batch_list_v_splits.append(batch_list_v)
-
-                    batch_t_output_splits.append(batch_sequence_output_list[s_:e_])
-                    batch_v_output_splits.append(batch_visual_output_list)
-                else:
-                    devc = torch.device('cuda:{}'.format(str(dev_id)))
-                    devc_batch_list = [tuple(t.to(devc) for t in b) for b in batch_list_t[s_:e_]]
-                    batch_list_t_splits.append(devc_batch_list)
-                    devc_batch_list = [tuple(t.to(devc) for t in b) for b in batch_list_v]
-                    batch_list_v_splits.append(devc_batch_list)
-
-                    devc_batch_list = [b.to(devc) for b in batch_sequence_output_list[s_:e_]]
-                    batch_t_output_splits.append(devc_batch_list)
-
-                    devc_batch_list = [b.to(devc) for b in batch_visual_output_list]
-                    batch_v_output_splits.append(devc_batch_list)
-
-            parameters_tuple_list = [(batch_list_t_splits[dev_id], batch_list_v_splits[dev_id],
-                                      batch_t_output_splits[dev_id], batch_v_output_splits[dev_id]) for dev_id in device_ids]
-            parallel_outputs = parallel_apply(_run_on_single_gpu, model, parameters_tuple_list, device_ids)
-            sim_matrix = []
-            for idx in range(len(parallel_outputs)):
-                sim_matrix += parallel_outputs[idx]
-            sim_matrix = np.concatenate(tuple(sim_matrix), axis=0)
-        else:
-            sim_matrix = _run_on_single_gpu(model, batch_list_t, batch_list_v, batch_sequence_output_list, batch_visual_output_list)
-            sim_matrix = np.concatenate(tuple(sim_matrix), axis=0)
+        sim_matrix = _run_on_single_gpu(model, batch_list_t, batch_list_v, batch_sequence_output_list, batch_visual_output_list)
+        sim_matrix = np.concatenate(tuple(sim_matrix), axis=0)
     
     np.save(os.path.join(args.output_dir,"sim_matrix.npy"),sim_matrix)
 
@@ -662,11 +625,10 @@ def main():
 
             output_model_file = save_model(epoch, args, model, optimizer, tr_loss, type_name="")
 
-            ## Run on val dataset, this process is *TIME-consuming*.
-            # logger.info("Eval on val dataset")
-            # R1 = eval_epoch(args, model, val_dataloader, device, n_gpu)
-
-            R1 = eval_epoch(args, model, test_dataloader, device, n_gpu)
+            # Run on val dataset, this process is *TIME-consuming*.
+            logger.info("Eval on val dataset")
+            R1 = eval_epoch(args, model, val_dataloader, device, n_gpu)
+            
             if best_score <= R1:
                 best_score = R1
                 best_output_model_file = output_model_file
