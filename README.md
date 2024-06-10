@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 + We provide annotations of five datasets and checkpoints of three teachers ([X-CLIP](https://github.com/xuguohai/X-CLIP), [TS2-Net](https://github.com/yuqi657/ts2_net) and [XPool](https://github.com/layer6ai-labs/xpool)) trained on five datasets at [Google drive](https://drive.google.com/drive/folders/1cU0ehXfucf4M5IyDRSxywBadCt1LyZWz?usp=sharing). Video captions and data splits are provided in `Annotations` and `VideoSet`.
 
-+ For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing). Put the videos into the corresponding `VideoSet` folder for each dataset. (It is recommended to use symbolic links.)
++ For raw videos, you can refer to the guides from [CLIP4Clip: Data Preparing](https://github.com/ArrowLuo/CLIP4Clip?tab=readme-ov-file#data-preparing). Put the videos into the corresponding `VideoData` folder for each dataset. (It is recommended to use symbolic links.)
 
 ### Data organization
 
@@ -37,10 +37,15 @@ data
 │   │   │   ├── MSRVTT_data.json
 │   │   │   ├── MSRVTT_JSFUSION_test.csv
 │   │   │   └── ...
-│   │   ├── Saves
-│   │   │   └── msrvtt-7k_xclip-as-teacher_vit32
+│   │   ├── FeatureData
+│   │   ├── Models
+│   │   │   └── msrvtt-7k_xclip+ts2net-as-teacher_vit32
 │   │   │       ├── run0
 │   │   │       └── ...
+│   │   ├── QuerySet
+│   │   │   ├── msrvtt1k-test-query.txt
+│   │   │   ├── msrvtt3k-test-query.txt
+│   │   │   └── ...
 │   │   └── VideoData
 │   │   │   ├── video0.mp4
 │   │   │   ├── video1.mp4
@@ -74,10 +79,14 @@ CUDA_VISIBLE_DEVICES=0,1 python -m torch.distributed.launch --nproc_per_node=2 t
 
 ### Inference
 
-You can specify which trained student model to use by setting `init_model` in config file. The similarity matrix between text and video will be saved under `output_dir`:
+Use the following command to extract video / text features:
 
 ```shell
-CUDA_VISIBLE_DEVICES=0 python -m torch.distributed.launch --nproc_per_node=1 inference.py --config_path configs/msrvtt-9k.yaml
+bash do_extract_video_feat.sh $test_collection $videoset $model_name
+# e.g. bash do_extract_video_feat.sh msrvtt mstvtt1k-test msrvtt/Models/msrvtt-7k_xclip+ts2net-as-teacher_vit32/run0
+
+bash do_extract_video_feat.sh $test_collection $queryset $model_name
+# e.g. bash do_extract_text_feat.sh msrvtt mstvtt1k-test-query msrvtt/Models/msrvtt-7k_xclip+ts2net-as-teacher_vit32/run0
 ```
 
 ### Evaluation
