@@ -495,4 +495,42 @@ class CLIP4Clip(CLIP4ClipPreTrainedModel):
             retrieve_logits = self._cross_similarity(sequence_output, visual_output, attention_mask, video_mask, )
             return retrieve_logits, contrastive_direction
 
-        
+    def get_video_output(self, video, video_mask, shaped=False, video_frame=-1):
+        if shaped is False:
+            video_mask = video_mask.view(-1, video_mask.shape[-1])
+            video = torch.as_tensor(video).float()
+            b, pair, bs, ts, channel, h, w = video.shape
+            video = video.view(b * pair * bs * ts, channel, h, w)
+            video_frame = bs * ts
+
+        bs_pair = video_mask.size(0)
+        visual_hidden = self.clip.encode_image(video, video_frame=video_frame).float()
+        visual_hidden = visual_hidden.view(bs_pair, -1, visual_hidden.size(-1))
+
+        # after AFA video feature
+        if self.task_config.sim_header == "seqTransf":
+            visual_output = visual_hidden
+            visual_output_original = visual_output #B 12 dim
+            
+            seq_length = visual_output.size(1)
+            position_ids = torch.arange(seq_length, dtype=torch.long, device=visual_output.device)
+            position_ids = position_ids.unsqueeze(0).expand(visual_output.size(0), -1)
+            frame_position_embeddings = self.frame_position_embeddings(position_ids)
+            visual_output = visual_output + frame_position_embeddings
+
+            extended_video_mask = (1.0 - video_mask.unsqueeze(1)) * -1000000.0
+            extended_video_mask = extended_video_mask.expand(-1, video_mask.size(1), -1)
+            visual_output = visual_output.permute(1, 0, 2)  # NLD -> LND
+            visual_output = self.transformerClip(visual_output, extended_video_mask)
+            visual_output = visual_output.permute(1, 0, 2)  # LND -> NLD
+            visual_output = visual_output + visual_output_original
+
+            # Frame Weight Predict Module V2
+            Frameweight = self.frameLinear(visual_output)
+            Frameweight = torch.nn.functional.relu(Frameweight)
+            Frameweight = self.frameLinear2(Frameweight)
+
+            visual_output_adapt = (visual_output * Frameweight.div(0.1).softmax(1)).sum(1) # 1-->0.1--->0.05
+            
+            return visual_output_adapt # [b, dim]
+        return visual_hidden

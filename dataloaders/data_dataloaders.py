@@ -5,7 +5,8 @@ from dataloaders.dataloader_msrvtt_retrieval import MSRVTT_DataLoader
 from dataloaders.dataloader_msvd_retrieval import MSVD_DataLoader
 from dataloaders.dataloader_activitynet_retrieval import ActivityNet_DataLoader
 from dataloaders.dataloader_didemo_retrieval import DiDeMo_DataLoader
-
+from dataloaders.video_dataloader import Video_DataLoader
+from dataloaders.text_dataloader import Text_DataLoader
 
 def dataloader_msrvtt_train(args, tokenizer):
     msrvtt_dataset = MSRVTT_TrainDataLoader(
@@ -270,6 +271,37 @@ def dataloader_didemo_test(args, tokenizer, subset="test"):
     )
     return dataloader_didemo, len(didemo_testset)
 
+def video_dataloader(args):
+    video_set = Video_DataLoader(
+        videofile_path=args.videofile_path,
+        videodata_dir=args.video_path,
+        feature_framerate=args.feature_framerate,
+        max_frames=args.max_frames,
+        frame_order=args.frame_order,
+        slice_framepos=args.slice_framepos,
+        image_resolution=args.image_resolution,
+    )
+    dataloader_video = DataLoader(
+        video_set,
+        batch_size=args.batch_size,
+        num_workers=args.num_thread_reader,
+        shuffle=False,
+        drop_last=False,
+    )
+    return dataloader_video, len(video_set)
+
+def text_dataloader(args):
+    text_set = Text_DataLoader(
+        queryfile_path=args.queryfile_path,
+    )
+    dataloader_text = DataLoader(
+        text_set,
+        batch_size=args.batch_size,
+        num_workers=args.num_thread_reader,
+        shuffle=False,
+        drop_last=False,
+    )
+    return dataloader_text, len(text_set)
 
 DATALOADER_DICT = {}
 DATALOADER_DICT["msrvtt"] = {"train":dataloader_msrvtt_train, "val":dataloader_msrvtt_val, "test":dataloader_msrvtt_test}
@@ -277,4 +309,5 @@ DATALOADER_DICT["msvd"] = {"train":dataloader_msvd_train, "val":dataloader_msvd_
 DATALOADER_DICT["lsmdc"] = {"train":dataloader_lsmdc_train, "val":dataloader_lsmdc_test, "test":dataloader_lsmdc_test}
 DATALOADER_DICT["activity"] = {"train":dataloader_activity_train, "val":dataloader_activity_test, "test":dataloader_activity_test}
 DATALOADER_DICT["didemo"] = {"train":dataloader_didemo_train, "val":dataloader_didemo_test, "test":dataloader_didemo_test}
-
+DATALOADER_DICT["video"] = video_dataloader
+DATALOADER_DICT["text"] = text_dataloader
