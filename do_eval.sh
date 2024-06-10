@@ -1,4 +1,9 @@
-python evaluation_copy.py --local_rank=0 \
-    --video_feat_path='data/datasets/msrvtt/FeatureData/msrvtt3k-test/msrvtt/msrvtt-7k_xclip+ts2net-as-teacher_vit32/run1' \
-    --text_feat_path='data/datasets/msrvtt/FeatureData/msrvtt3k-query/msrvtt/msrvtt-7k_xclip+ts2net-as-teacher_vit32/run1' \
-    --gt_file_path='data/datasets/msrvtt/Annotations/msrvtt3k-gt.txt'
+test_collection=$1
+text_feat_name=$2
+video_feat_name=$3
+gt_file_name=$4
+
+python evaluation.py --local_rank=0 \
+    --text_feat_path="data/datasets/$test_collection/FeatureData/$text_feat_name" \
+    --video_feat_path="data/datasets/$test_collection/FeatureData/$video_feat_name" \
+    --gt_file_path="data/datasets/$test_collection/Annotations/$gt_file_name.txt"
