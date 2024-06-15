@@ -85,7 +85,7 @@ Use the following command to extract video / text features:
 bash do_extract_video_feat.sh $test_collection $videoset $model_name
 # e.g. bash do_extract_video_feat.sh msrvtt mstvtt1k-test msrvtt/Models/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0
 
-bash do_extract_video_feat.sh $test_collection $queryset $model_name
+bash do_extract_text_feat.sh $test_collection $queryset $model_name
 # e.g. bash do_extract_text_feat.sh msrvtt mstvtt1k-query msrvtt/Models/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0
 ```
 
