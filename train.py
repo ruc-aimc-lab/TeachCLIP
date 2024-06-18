@@ -632,6 +632,10 @@ def main():
             if best_score <= R1:
                 best_score = R1
                 best_output_model_file = output_model_file
+
+                cur_best_model = model.module if hasattr(model, 'module') else model
+                output_model_file = os.path.join(args.output_dir, "best_model.bin")
+                torch.save(cur_best_model.state_dict(), output_model_file)
             logger.info("The best model is: {}, the R1 is: {:.4f}".format(best_output_model_file, best_score))
 
 if __name__ == "__main__":
