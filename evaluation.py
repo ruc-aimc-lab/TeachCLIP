@@ -47,17 +47,37 @@ def cal_sim_matrix(args):
     sim_matrix_npy = sim_matrix.cpu().numpy()
     return sim_matrix_npy
 
-def get_metrics(sim_matrix):
+def get_metrics(sim_matrix, args):
     if sim_matrix.shape[0] != sim_matrix.shape[1]:
-        print("Eval under the multi-sentence per video clip setting.")
-        print("sentence num: {}, video num: {}".format(sim_matrix.shape[0], sim_matrix.shape[1]))
-        sim_matrix = sim_matrix.reshape(sim_matrix.shape[1], -1, sim_matrix.shape[1])
+        print("before reshape, sim matrix size: {} x {}".format(sim_matrix.shape[0], sim_matrix.shape[1]))
+        cut_off_points2len_ = []
+        tmp_video_ids = []
+        i = 0
+        for line in open(args.gt_file_path, 'r'):
+            query_id, video_id = line.strip().split('\t')
+            if video_id not in tmp_video_ids:
+                tmp_video_ids.append(video_id)
+                cut_off_points2len_.append(i)
+            i = i + 1
+        cut_off_points2len_ = cut_off_points2len_[1:]
+        cut_off_points2len_.append(i)
+
+        max_length = max([e_-s_ for s_, e_ in zip([0]+cut_off_points2len_[:-1], cut_off_points2len_)])
+        sim_matrix_new = []
+        for s_, e_ in zip([0] + cut_off_points2len_[:-1], cut_off_points2len_):
+            sim_matrix_new.append(np.concatenate((sim_matrix[s_:e_],
+                                                  np.full((max_length-e_+s_, sim_matrix.shape[1]), -np.inf)), axis=0))
+        sim_matrix = np.stack(tuple(sim_matrix_new), axis=0)
+        print("after reshape, sim matrix size: {} x {} x {}".
+                    format(sim_matrix.shape[0], sim_matrix.shape[1], sim_matrix.shape[2]))
 
         tv_metrics = tensor_text_to_video_metrics(sim_matrix)
         vt_metrics = compute_metrics(tensor_video_to_text_sim(sim_matrix))
     else:
+        print("sim matrix size: {}, {}".format(sim_matrix.shape[0], sim_matrix.shape[1]))
         tv_metrics = compute_metrics(sim_matrix)
         vt_metrics = compute_metrics(sim_matrix.T)
+        print('\t Length-T: {}, Length-V:{}'.format(len(sim_matrix), len(sim_matrix[0])))
 
     print("Text-to-Video:")
     print('\t>>>  R@1: {:.1f} - R@5: {:.1f} - R@10: {:.1f} - Median R: {:.1f} - Mean R: {:.1f}'.
@@ -65,13 +85,11 @@ def get_metrics(sim_matrix):
     print("Video-to-Text:")
     print('\t>>>  V2T$R@1: {:.1f} - V2T$R@5: {:.1f} - V2T$R@10: {:.1f} - V2T$Median R: {:.1f} - V2T$Mean R: {:.1f}'.
                 format(vt_metrics['R1'], vt_metrics['R5'], vt_metrics['R10'], vt_metrics['MR'], vt_metrics['MeanR']))
-    
 
 def main():
     args = get_args()
-
     sim_matrix = cal_sim_matrix(args)
-    get_metrics(sim_matrix)
+    get_metrics(sim_matrix, args)
 
 if __name__ == "__main__":
     main()
