@@ -42,6 +42,3 @@ train:
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
   output_dir: "data/datasets/activitynet/Models/xclip-as-teacher_vit32"
-
-eval:
-  init_model: "" # best model checkpoint for evaluation
