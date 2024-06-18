@@ -4,6 +4,7 @@ from utils.bigfile import BigFile
 from tqdm import tqdm
 from metrics import compute_metrics, tensor_text_to_video_metrics, tensor_video_to_text_sim
 import argparse
+import numpy as np
 
 def get_args(description='CLIP4Clip Distill on Retrieval Task'):
     parser = argparse.ArgumentParser(description=description)
