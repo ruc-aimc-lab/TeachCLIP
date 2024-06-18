@@ -41,7 +41,4 @@ train:
   n_display: 10
   warmup_proportion: 0.1
   gradient_accumulation_steps: 1
-  output_dir: "data/datasets/didemo/Saves/xclip-as-teacher_vit32"
-
-eval:
-  init_model: "" # best model checkpoint for evaluation
+  output_dir: "data/datasets/didemo/Models/xclip-as-teacher_vit32"
