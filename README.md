@@ -86,7 +86,7 @@ bash do_extract_video_feat.sh $test_collection $videoset $model_name
 # e.g. bash do_extract_video_feat.sh msrvtt msrvtt1k-test msrvtt/Models/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0
 
 bash do_extract_text_feat.sh $test_collection $queryset $model_name
-# e.g. bash do_extract_text_feat.sh msrvtt msrvtt1k-query msrvtt/Models/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0
+# e.g. bash do_extract_text_feat.sh msrvtt msrvtt1k-test-query msrvtt/Models/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0
 ```
 
 ### Evaluation
@@ -95,7 +95,7 @@ After obtaining the text and video features, the evaluation metrics can be calcu
 
 ```shell
 bash do_eval.sh $test_collection $text_feat_name $video_feat_name $gt_file_name
-# e.g. bash do_eval.sh msrvtt msrvtt1k-query/msrvtt/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0 msrvtt1k-test/msrvtt/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0 msrvtt1k-gt
+# e.g. bash do_eval.sh msrvtt msrvtt1k-test-query/msrvtt/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0 msrvtt1k-test/msrvtt/msrvtt-9k_xclip+ts2net-as-teacher_vit32/run0 msrvtt1k-gt
 ```
 
 ## Citation
