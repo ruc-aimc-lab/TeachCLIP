@@ -252,8 +252,6 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
 
     
     for step, batch in enumerate(train_dataloader):
-        # if n_gpu == 1:
-        #     # multi-gpu does scattering it-self
         batch = tuple(t.to(device=device, non_blocking=True) for t in batch)
 
         #####################superparam##############
@@ -321,8 +319,6 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
 
         fine_loss = 0.0
         for sentence2frames_sim in sentence2frames_sims:
-            # print("F",Frameweight[0:10])
-            # print("sim",sentence2frames_sim[0:10])
             if fine_method=="ce":
                 tmp_fine_loss = ((-1)*torch.log(Frameweight)*sentence2frames_sim)
                 fine_loss = fine_loss+tmp_fine_loss.mean()
@@ -335,11 +331,7 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
             elif fine_method=="l1":
                 tmp_fine_loss = distill_loss_fun(Frameweight,sentence2frames_sim)
                 fine_loss = fine_loss+tmp_fine_loss.mean()
-            # cor_Frameweight = Frameweight-Frameweight.mean(-1).view(-1,1)
-            # cor_sentence2frames_sim = sentence2frames_sim-sentence2frames_sim.mean(-1).view(-1,1)
-            # tmp_fine_loss = 1-((cor_Frameweight*cor_sentence2frames_sim).sum(1)/(cor_Frameweight.norm(dim=1)*cor_sentence2frames_sim.norm(dim=1)))
-            # tmp_fine_loss = tmp_fine_loss.mean()
-            # fine_loss = fine_loss+tmp_fine_loss
+
         fine_loss = fine_loss/len(sentence2frames_sims)
 
         if distill_method=="ce":
