@@ -342,27 +342,11 @@ def train_epoch(epoch, args, model, teacher_models, train_dataloader, device, n_
             # fine_loss = fine_loss+tmp_fine_loss
         fine_loss = fine_loss/len(sentence2frames_sims)
 
-        
-        start_epoch = 0
-        if epoch >= start_epoch:
-            if distill_method=="ce":
-                # loss =  distill_loss + fine_loss 
-                loss = gt_loss + distill_loss * 10 + fine_loss 
-            else:
-                # loss =  distill_loss + fine_loss #0.2 x 1 x 2 
-                loss = gt_loss*0.2 + distill_loss + fine_loss*2.0  #0.2 x 1 x 2 
-                # loss = gt_loss + distill_loss*0.2
+        if distill_method=="ce":
+            loss = gt_loss + distill_loss * 10 + fine_loss 
         else:
-            if distill_method=="ce":
-                # loss =  distill_loss 
-                loss = gt_loss + distill_loss * 10
-            else:
-                # loss =  distill_loss 
-                loss = gt_loss + distill_loss 
-                
+            loss = gt_loss*0.2 + distill_loss + fine_loss*2.0  #0.2 x 1 x 2 
 
-
-        
         loss = loss.mean()  # mean() to average on multi-gpu.
         if args.gradient_accumulation_steps > 1:
             loss = loss / args.gradient_accumulation_steps
