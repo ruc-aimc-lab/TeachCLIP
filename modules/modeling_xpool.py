@@ -18,7 +18,7 @@ class XPool(nn.Module):
         
         if self.huggingface:
             from transformers import CLIPModel
-            self.clip = CLIPModel.from_pretrained("ViT-B/32")
+            self.clip = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 
         self.pool_frames = Transformer()
 
