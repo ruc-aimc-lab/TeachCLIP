@@ -43,6 +43,16 @@ class Video_DataLoader(Dataset):
                             break
             self.video_paths.append(video_path)
 
+        self.test_set_start_time = {}
+        self.test_set_end_time = {}
+        if 'didemo' in videofile_path: # get start and end timestamps
+            for k_ in self.video_ids:
+                self.test_set_start_time[k_] = 0
+                # trick to save time on obtaining each video length
+                # [https://github.com/LisaAnne/LocalizingMoments/blob/master/README.md]:
+                # Some videos are longer than 30 seconds. These videos were truncated to 30 seconds during annotation.
+                self.test_set_end_time[k_] = 31
+
         self.feature_framerate = feature_framerate
         self.max_frames = max_frames
         # 0: ordinary order; 1: reverse order; 2: random order.
@@ -68,36 +78,43 @@ class Video_DataLoader(Dataset):
         # Pair x L x T x 3 x H x W
         video = np.zeros((len(choice_video_ids), self.max_frames, 1, 3,
                           self.rawVideoExtractor.size, self.rawVideoExtractor.size), dtype=np.float)
+        try:
+            for i, video_id in enumerate(choice_video_ids):
+                video_path = choice_video_paths[i]
+                if len(self.test_set_start_time) == 0:
+                    raw_video_data = self.rawVideoExtractor.get_video_data(video_path)
+                else:
+                    raw_video_data = self.rawVideoExtractor.get_video_data(video_path, self.test_set_start_time[video_id], self.test_set_end_time[video_id])
 
-        for i, video_id in enumerate(choice_video_ids):
-            video_path = choice_video_paths[i]
-            raw_video_data = self.rawVideoExtractor.get_video_data(video_path)
-            raw_video_data = raw_video_data['video']
-            if len(raw_video_data.shape) > 3:
-                raw_video_data_clip = raw_video_data
-                # L x T x 3 x H x W
-                raw_video_slice = self.rawVideoExtractor.process_raw_data(raw_video_data_clip)
-                if self.max_frames < raw_video_slice.shape[0]:
-                    if self.slice_framepos == 0:
-                        video_slice = raw_video_slice[:self.max_frames, ...]
-                    elif self.slice_framepos == 1:
-                        video_slice = raw_video_slice[-self.max_frames:, ...]
+                raw_video_data = raw_video_data['video']
+                if len(raw_video_data.shape) > 3:
+                    raw_video_data_clip = raw_video_data
+                    # L x T x 3 x H x W
+                    raw_video_slice = self.rawVideoExtractor.process_raw_data(raw_video_data_clip)
+                    if self.max_frames < raw_video_slice.shape[0]:
+                        if self.slice_framepos == 0:
+                            video_slice = raw_video_slice[:self.max_frames, ...]
+                        elif self.slice_framepos == 1:
+                            video_slice = raw_video_slice[-self.max_frames:, ...]
+                        else:
+                            sample_indx = np.linspace(0, raw_video_slice.shape[0] - 1, num=self.max_frames, dtype=int)
+                            video_slice = raw_video_slice[sample_indx, ...]
                     else:
-                        sample_indx = np.linspace(0, raw_video_slice.shape[0] - 1, num=self.max_frames, dtype=int)
-                        video_slice = raw_video_slice[sample_indx, ...]
-                else:
-                    video_slice = raw_video_slice
+                        video_slice = raw_video_slice
 
-                video_slice = self.rawVideoExtractor.process_frame_order(video_slice, frame_order=self.frame_order)
+                    video_slice = self.rawVideoExtractor.process_frame_order(video_slice, frame_order=self.frame_order)
 
-                slice_len = video_slice.shape[0]
-                max_video_length[i] = max_video_length[i] if max_video_length[i] > slice_len else slice_len
-                if slice_len < 1:
-                    pass
+                    slice_len = video_slice.shape[0]
+                    max_video_length[i] = max_video_length[i] if max_video_length[i] > slice_len else slice_len
+                    if slice_len < 1:
+                        pass
+                    else:
+                        video[i][:slice_len, ...] = video_slice
                 else:
-                    video[i][:slice_len, ...] = video_slice
-            else:
-                print("video path: {} error. video id: {}".format(video_path, video_id))
+                    print("video path: {} error. video id: {}".format(video_path, video_id))
+        except Exception as excep:
+            print("video path: {} error. Error: {}".format(video_path, excep))
+            pass
 
         for i, v_length in enumerate(max_video_length):
             video_mask[i][:v_length] = [1] * v_length
