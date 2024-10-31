@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 ### Data organization
 
-Before starting to run the code, please organize the downloaded data in the following format: (The `Models` and `FeatureData` folders will be automatically generated during training and testing)
+Before starting to run the code, please organize the downloaded data in the following format: (The `Models` and `FeatureData` folders will be automatically generated during training and testing, respectively.)
 
 ```shell
 data
