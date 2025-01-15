@@ -9,7 +9,7 @@ The official source code of our CVPR24 paper TeachCLIP, "[Holistic Features are 
 We used Anaconda to setup a deep learning workspace that supports PyTorch. Run the following script to install all the required packages.
 
 ```shell
-conda create -n TeachCLIP python==3.8 -y
+conda create -n TeachCLIP python==3.9 -y
 conda activate TeachCLIP
 git clone https://github.com/ruc-aimc-lab/TeachCLIP.git
 cd TeachCLIP
