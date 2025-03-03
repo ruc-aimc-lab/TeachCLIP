@@ -183,12 +183,13 @@ def prep_optimizer(args, model, num_train_optimization_steps, device, n_gpu, loc
     for n, p in param_optimizer:
         if n=="frameLinear.weight" or n=="frameLinear.bias" or n=="frameLinear2.weight" or n=="frameLinear2.bias":
             new_para.append((n, p))
-            param_optimizer.remove((n, p))
+    for item in new_para:
+        param_optimizer.remove(item)
 
-
-    #frameLinear.weight
-    # print(list(param_optimizer.keys()))
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+
+    decay_new_para = [(n, p) for n, p in new_para if not any(nd in n for nd in no_decay)]
+    no_decay_new_para = [(n, p) for n, p in new_para if any(nd in n for nd in no_decay)]
 
     decay_param_tp = [(n, p) for n, p in param_optimizer if not any(nd in n for nd in no_decay)]
     no_decay_param_tp = [(n, p) for n, p in param_optimizer if any(nd in n for nd in no_decay)]
@@ -205,7 +206,8 @@ def prep_optimizer(args, model, num_train_optimization_steps, device, n_gpu, loc
         {'params': [p for n, p in decay_noclip_param_tp], 'weight_decay': weight_decay},
         {'params': [p for n, p in no_decay_clip_param_tp], 'weight_decay': 0.0, 'lr': args.lr * coef_lr},
         {'params': [p for n, p in no_decay_noclip_param_tp], 'weight_decay': 0.0},
-        {'params': [p for n, p in new_para], 'weight_decay': weight_decay, 'lr': args.lr * 10}
+        {'params': [p for n, p in decay_new_para], 'weight_decay': weight_decay, 'lr': args.lr*10},
+        {'params': [p for n, p in no_decay_new_para], 'weight_decay': 0.0, 'lr': args.lr*10}
     ]
 
     scheduler = None
