@@ -530,6 +530,7 @@ class CLIP4Clip(CLIP4ClipPreTrainedModel):
             Frameweight = torch.nn.functional.relu(Frameweight)
             Frameweight = self.frameLinear2(Frameweight)
 
+            visual_output = visual_output / visual_output.norm(dim=-1, keepdim=True)
             visual_output_adapt = (visual_output * Frameweight.div(0.1).softmax(1)).sum(1) # 1-->0.1--->0.05
             
             return visual_output_adapt # [b, dim]
